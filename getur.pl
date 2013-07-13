@@ -12,9 +12,13 @@
 #     That output ↪ ✓ ✘ respectively
 #   - Get user:
 #       + Then ask what to do. Download all albums?
+#   - Make script more humorous. 
+#       + Array of responses, f.ex. instead of 'grabbed' we 
+#         also have 'yanked' and 'liberated' and so on.
 #
 
 use strict;
+
 package Files;
 
 use 5.014;
@@ -31,6 +35,7 @@ use v5.14;
 $|=1;
 
 my @errors          = ('400', '401', '403', '404', '429', '500');
+my @verbs           = ('Grabbed', 'Yanked', 'Stole', 'Archived', 'Made off with', 'Assimilated', 'Snatched', 'Nabbed', 'Glommed', 'Caught', 'Corraled', 'Landed', 'Seized', 'Amassed', 'Collected', 'Gathered', 'Hustled', 'Snagged', 'Obtained', 'Digested', 'Grasped');
 my @types           = ('album', 'image');
 my $default_prompt  = "↪";
 my $default_success = "✓";
@@ -55,7 +60,7 @@ sub get
     } else {
             download($target->{id}, $target->{id}, $target->{link}, 0, $total, $subpath);
     }
-    say "\e[A$default_success Grabbed ($total/$total)\e[K";
+    say "\e[A$default_success $verbs[rand($#verbs+1)] $total/$total images.\e[K";
 }
 
 sub download 
@@ -97,6 +102,37 @@ sub callback {
     print PIC $data;
 }
 
+package Responses;
+
+    ###########
+    # classes:
+    # --------
+    #
+    # success_connect
+    # fail_connect
+    #
+    # success_verify:
+    #
+    #   given ($type) {
+    #       when (image) { blah }
+    #       when (album) { blah }
+    #   }
+    #
+    # fail_verify:
+    #
+    #       ditto
+    #
+    # success_download
+    # fail_download
+    #
+    # fail_errorcode(errorcode) {
+    #   given (errorcode) {
+    #
+    #       when (404) { say "it just doesn't exist, man" }
+    #       when (500) { ... }
+    #
+    #######################################################
+    
 package main;
         
 # Initialize the API library
@@ -143,6 +179,7 @@ sub no_args
     while (1) {
         my $id = prompt("Gimme an ID");
         my ($response, $imgur) = check_validity($id, $imgur);
+        say "\e[A$default_success $id is $response.\e[K";
         
         if ($ARGV[1]) { Files::get($imgur, $response, $ARGV[1]) }
         else { Files::get($imgur, $response, ".") }
@@ -156,7 +193,7 @@ sub args {
     my $id = shift;
     say "$default_prompt $ARGV[0] ...";
     my ($response, $imgur) = check_validity($id, $imgur);
-    say "\e[A$default_success $ARGV[0] is $response";
+    say "\e[A$default_success $ARGV[0] is $response.\e[K";
     
     if ($ARGV[1]) { Files::get($imgur, $response, $ARGV[1]) }
     else { Files::get($imgur, $response, ".") }
