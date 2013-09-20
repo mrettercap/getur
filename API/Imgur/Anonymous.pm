@@ -48,7 +48,8 @@ sub make_request
     my $raw;
     if ($self->{parse}) {
         $raw = $self->agent->request($request);
-        return decode_json $raw->content or croak "ERROR: $!";
+        my $decoded = decode_json($raw->content) or croak "ERROR: $!";
+        return $decoded;
     } else {
         return $self->agent($request);
     }

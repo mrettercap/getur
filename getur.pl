@@ -1,5 +1,6 @@
 #!/usr/bin/env perl -w
 #
+#   🐊 GATOR
 #
 #   TODO:
 #   -----
@@ -37,9 +38,10 @@ $|=1;
 my @errors          = ('400', '401', '403', '404', '429', '500');
 my @verbs           = ('Grabbed', 'Yanked', 'Stole', 'Archived', 'Made off with', 'Assimilated', 'Snatched', 'Nabbed', 'Glommed', 'Caught', 'Corraled', 'Landed', 'Seized', 'Amassed', 'Collected', 'Gathered', 'Hustled', 'Snagged', 'Obtained', 'Digested', 'Grasped');
 my @types           = ('album', 'image');
-my $default_prompt  = "↪";
-my $default_success = "✓";
-my $default_fail    = "✘";
+my $default_prompt  = "⭕ ";
+my $default_success = "🐊 ";
+my $default_fail    = "💥 ";
+my $default_dling   = "⚡ ";
 
 sub get
 {
@@ -72,7 +74,7 @@ sub download
     my $total = shift;
     my $subpath = shift;
     
-    say "\e[A$default_prompt $id ($current/$total)";
+    say "\e[A$default_dling $id ($current/$total) ...";
     
     # Add leading zeroes for formatting
     my $alz = sprintf("%0".length($total)."d", ($current));
@@ -160,7 +162,7 @@ sub check_validity {
     }
     
     # if we make it this far, we're SOL.
-    die "$default_fail '$id' just doesn't exist on imgur, man. $default_prompt";
+    die "$default_fail '$id' just doesn't exist on imgur, man. $@\n";
 }
 
 # prompt function
@@ -179,7 +181,7 @@ sub no_args
     while (1) {
         my $id = prompt("Gimme an ID");
         my ($response, $imgur) = check_validity($id, $imgur);
-        say "\e[A$default_success $id is $response.\e[K";
+        say "\e[A$default_success Found $response $id.\e[K";
         
         if ($ARGV[1]) { Files::get($imgur, $response, $ARGV[1]) }
         else { Files::get($imgur, $response, ".") }
@@ -193,7 +195,7 @@ sub args {
     my $id = shift;
     say "$default_prompt $ARGV[0] ...";
     my ($response, $imgur) = check_validity($id, $imgur);
-    say "\e[A$default_success $ARGV[0] is $response.\e[K";
+    say "\e[A$default_success Found $response $ARGV[0].\e[K";
     
     if ($ARGV[1]) { Files::get($imgur, $response, $ARGV[1]) }
     else { Files::get($imgur, $response, ".") }
